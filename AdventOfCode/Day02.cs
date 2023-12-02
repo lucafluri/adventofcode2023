@@ -29,6 +29,7 @@ public class Day02 : BaseDay
     {
         _input = File.ReadAllText(InputFilePath);
         _inputLines = File.ReadAllLines(InputFilePath);
+        ParseGames(_inputLines);
     }
 
     private void ParseGames(string[] lines)
@@ -108,7 +109,6 @@ public class Day02 : BaseDay
     {
         Console.WriteLine("");
         
-        ParseGames(_inputLines);
         
         int total = 0;
 
