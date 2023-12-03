@@ -2,7 +2,7 @@
 
 namespace AdventOfCode;
 
-public class Day_26 : BaseDay
+public class Day04 : BaseDay
 {
     private readonly string[] _input;
     
@@ -10,7 +10,7 @@ public class Day_26 : BaseDay
     private int total2 = 0;
     
     
-    public Day_26()
+    public Day04()
     {
         _input = File.ReadAllLines(InputFilePath);
     }
