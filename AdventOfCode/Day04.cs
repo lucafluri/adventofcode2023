@@ -5,9 +5,7 @@ namespace AdventOfCode;
 public class Day04 : BaseDay
 {
     private readonly string[] _input;
-    
     private int total = 0;
-    
     
     public Day04()
     {
@@ -43,44 +41,60 @@ public class Day04 : BaseDay
 
     public override ValueTask<string> Solve_2()
     {
-        total = 0;
-        var idx = 0;
-        var cards = new int[300];
-        var q = new Queue<int>();
-        var m = new Dictionary<int, List<int>>();
+        // SLOW SOLUTION
+        // total = 0;
         
-        //Save into map
-        foreach (var line in _input)
-        {
-            idx++;
+        // var idx = 0;
+        //var cards = new int[_input.Length];
+      
+        // var q = new Queue<int>();
+        // var m = new Dictionary<int, List<int>>();
+        //
+        // //Save into map
+        // foreach (var line in _input)
+        // {
+        //     idx++;
+        //
+        //     var count = getWonCount(line);
+        //     var wins = new List<int>();
+        //     for(var i = idx+1; i <= idx + count; i++)
+        //     {
+        //         wins.Add(i);
+        //     }
+        //     
+        //     m.Add(idx, wins);
+        //     q.Enqueue(idx);
+        // }
+        //
+        //
+        // int current;
+        // while (q.Any())
+        // {
+        //     current = q.Dequeue(); 
+        //     cards[current]++;
+        //     
+        //     //Iterate over all won cards 
+        //     foreach(var i in m[current])
+        //     {
+        //         q.Enqueue(i);
+        //     }
+        // }
+        //
+        // total = cards.Sum();
+        
+        
+        // Nice and fast Solution
+        var cards = Enumerable.Repeat<int>(1, _input.Length).ToArray();
 
-            var count = getWonCount(line);
-            var wins = new List<int>();
-            for(var i = idx+1; i <= idx + count; i++)
-            {
-                wins.Add(i);
-            }
-            
-            m.Add(idx, wins);
-            q.Enqueue(idx);
-        }
-        
-        
-        int current;
-        while (q.Any())
+        for (int j = 0; j < _input.Length; j++)
         {
-            current = q.Dequeue(); 
-            cards[current]++;
-            
-            //Iterate over all won cards 
-            foreach(var i in m[current])
+            var wonCount = getWonCount(_input[j]);
+            for (var i = 0; i < wonCount; i++)
             {
-                q.Enqueue(i);
+                cards[j + i + 1] += cards[j];
             }
         }
         
-        total = cards.Sum();
-        
-        return new ValueTask<string>(total.ToString());
+        return new ValueTask<string>(cards.Sum().ToString());
     } 
 }
