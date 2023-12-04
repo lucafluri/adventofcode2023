@@ -9,7 +9,6 @@ public class Day03 : BaseDay
     private List<Symbol>[] symbols;
     
     private int total = 0;
-    private int total2 = 0;
     
     private class Num
     {
@@ -94,6 +93,7 @@ public class Day03 : BaseDay
 
     public override ValueTask<string> Solve_2()
     {
+        total = 0;
         //Iterate over all symbols per line and check whether symbol is adjacent to exactly two nums in same line and above and below
         //If so multiply nums together and add to total2
         for (var i = 0; i < symbols.Length; i++)
@@ -146,10 +146,10 @@ public class Day03 : BaseDay
                 }
 
                 if (numCount == 2)
-                    total2 += num1 * num2;
+                    total += num1 * num2;
             }
         }
         
-        return new ValueTask<string>(total2.ToString());
+        return new ValueTask<string>(total.ToString());
     } 
 }
