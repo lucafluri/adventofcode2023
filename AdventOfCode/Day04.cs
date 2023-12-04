@@ -6,19 +6,26 @@ public class Day04 : BaseDay
 {
     private readonly string[] _input;
     private int total = 0;
+    private int[] counts;
+    
     
     public Day04()
     {
         _input = File.ReadAllLines(InputFilePath);
+        counts = new int[_input.Length];
+        
+        for(var i = 0; i < _input.Length; i++)
+        {
+            counts[i] = getWonCount(_input[i]);
+        }
     }
 
-    private int getWonCount(string line)
+    private int getWonCount(string inp)
     {
-        string inp = line;
+        // string inp = line;
         inp = Regex.Replace(inp, @"\s+", " ");
         Regex rgx = new Regex(".*:(.*)\\|(.*)");
         var match = rgx.Match(inp);
-        List<int> nums = new List<int>();
         var l1 = match.Groups[1].ToString().Trim().Split(" ").ToList();
         var l2 = match.Groups[2].ToString().Trim().Split(" ").ToList();
             
@@ -29,9 +36,8 @@ public class Day04 : BaseDay
 
     public override ValueTask<string> Solve_1()
     {
-        foreach (var line in _input)
+        foreach (var c in counts)
         {
-            var c = getWonCount(line); 
             if(c != 0)
                 total += (int) Math.Floor(Math.Pow(2, c-1));    
         }
@@ -88,7 +94,7 @@ public class Day04 : BaseDay
 
         for (int j = 0; j < _input.Length; j++)
         {
-            var wonCount = getWonCount(_input[j]);
+            var wonCount = counts[j];
             for (var i = 0; i < wonCount; i++)
             {
                 cards[j + i + 1] += cards[j];
