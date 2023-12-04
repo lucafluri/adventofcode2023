@@ -2,14 +2,14 @@
 
 namespace AdventOfCode;
 
-public class Day_26 : BaseDay
+public class Day05 : BaseDay
 {
     private readonly string[] _input;
     
     private int total = 0;
     
     
-    public Day_26()
+    public Day05()
     {
         _input = File.ReadAllLines(InputFilePath);
     }
@@ -27,5 +27,4 @@ public class Day_26 : BaseDay
         total = 0;
         return new ValueTask<string>(total.ToString());
     } 
-}
 }
