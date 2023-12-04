@@ -28,4 +28,3 @@ public class Day_26 : BaseDay
         return new ValueTask<string>(total.ToString());
     } 
 }
-}
