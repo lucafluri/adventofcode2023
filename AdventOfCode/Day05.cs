@@ -5,86 +5,66 @@ namespace AdventOfCode;
 
 public class Day05 : BaseDay
 {
-    private readonly string[] _input;
-    
-    private int total = 0;
-    List<Map> maps = new List<Map>();
-    List<Int128> seeds = new List<Int128>();
-    Queue<SeedRange> ranges = new Queue<SeedRange>();
+    private readonly List<Map> _maps = new List<Map>();
+    private readonly List<Int128> _seeds = new List<Int128>();
+    private Queue<SeedRange> _ranges = new Queue<SeedRange>();
 
-    public class Mapping
+    private class Mapping
     {
-        public Int128 source { get; set; }
-        public Int128 dest { get; set; }
-        public Int128 range { get; set; }
+        public Int128 Source { get; init; }
+        public Int128 Dest { get; init; }
+        public Int128 Range { get; init; }
     }
 
-    public class Map
+    private class Map
     {
-        public List<Mapping> mappings = new List<Mapping>();
+        public readonly List<Mapping> Mappings = new List<Mapping>();
     }
     
-    private List<Int128> GetNumbers(string line)
+    private class SeedRange()
     {
-        Regex rgxNonDigit = new Regex("[^0-9]");
-        var numbers = new List<Int128>();
+        public Int128 Start { get; init; }
+        public Int128 End { get; init; }
+    }
+    
+    private static List<Int128> GetNumbers(string line)
+    {
+        var rgxNonDigit = new Regex("[^0-9]");
         var s = rgxNonDigit.Replace(line, " ");
         s = Regex.Replace(s, @"\s+", " ");
-        foreach (var seed in s.Trim().Split(" "))
-        {
-            if(seed != "")
-                numbers.Add(Int128.Parse(seed));
-        }
-        return numbers;
+        return (from seed in s.Trim().Split(" ") where seed != "" select Int128.Parse(seed)).ToList();
     }
 
-    bool isLetter(string str) => !String.IsNullOrEmpty(str) && Char.IsLetter(str[0]);
+    private static bool IsLetter(string str) => !String.IsNullOrEmpty(str) && Char.IsLetter(str[0]);
     
     public Day05()
     {
-        _input = File.ReadAllLines(InputFilePath);
+        var input = File.ReadAllLines(InputFilePath);
 
-        for (var i = 0; i < _input.Length; i++)
+        for (var i = 0; i < input.Length; i++)
         {
-            if(_input[i].Length == 0)
-                continue;
-            if (i == 0)
-                seeds = GetNumbers(_input[i]);
+            if (i == 0) _seeds = GetNumbers(input[i]);
+            if (IsLetter(input[i])) _maps.Add(new Map());
 
-            if (isLetter(_input[i]))
-                maps.Add(new Map());
+            if (input[i] == "" || IsLetter(input[i])) continue;
+            var nums = GetNumbers(input[i]);
 
-            if (_input[i] == "" || isLetter(_input[i])) continue;
-            var nums = GetNumbers(_input[i]);
-            Mapping m = new Mapping();
-            m.dest = nums[0];
-            m.source = nums[1];
-            m.range = nums[2];
-            maps[^1].mappings.Add(m);
+            _maps[^1].Mappings.Add(new Mapping() { Dest = nums[0], Source = nums[1], Range = nums[2] });
         }
-    }
-
-    public class SeedRange()
-    {
-        public Int128 start { get; set; }
-        public Int128 end { get; set; }
     }
 
     public override ValueTask<string> Solve_1()
     {
-        List<Int128> seeds2 = new List<Int128>(seeds);
+        var seeds2 = new List<Int128>(_seeds);
         for(var i = 0; i < seeds2.Count; i++)
         {
             var seed = seeds2[i];
-            foreach (var map in maps)
+            foreach (var map in _maps)
             {
-                foreach (var mapping in map.mappings)
+                foreach (var mapping in map.Mappings.Where(mapping => seed >= mapping.Source && seed < mapping.Source + mapping.Range))
                 {
-                    if (seed >= mapping.source && seed < mapping.source + mapping.range)
-                    {
-                        seed = mapping.dest + (seed - mapping.source);
-                        break;
-                    }
+                    seed = mapping.Dest + (seed - mapping.Source);
+                    break;
                 }
             }
             seeds2[i] = seed;
@@ -94,48 +74,44 @@ public class Day05 : BaseDay
 
     public override ValueTask<string> Solve_2()
     {
-        for (var i = 0; i < seeds.Count; i += 2)
+        for (var i = 0; i < _seeds.Count; i += 2)
         {
-            Int128 start = seeds[i];
-            Int128 range = seeds[i + 1];
+            var start = _seeds[i];
+            var range = _seeds[i + 1];
             
-            ranges.Enqueue(new SeedRange(){start = start, end = start + range});
+            _ranges.Enqueue(new SeedRange(){Start = start, End = start + range});
         }
         
-        // printRanges(ranges, "Initial");
-        foreach (var map in maps)
+        foreach (var map in _maps)
         {
             var newRanges = new Queue<SeedRange>();
-            while(ranges.Any())
+            while(_ranges.Count != 0)
             {
-                var r = ranges.Dequeue();
+                var r = _ranges.Dequeue();
                 var mapped = false;
                 
-                foreach (var m in map.mappings)
+                foreach (var m in map.Mappings)
                 {
-                    var olstart = Int128.Max(r.start, m.source);
-                    var olend = Int128.Min(r.end, m.source + m.range);
-                    
-                    
-                    if (olstart < olend)
-                    {
-                        newRanges.Enqueue(new SeedRange(){start = olstart-m.source+m.dest, end = olend-m.source+m.dest});
+                    var overlapStart = Int128.Max(r.Start, m.Source);
+                    var overlapEnd = Int128.Min(r.End, m.Source + m.Range);
 
-                        if (r.start < olstart)
-                            ranges.Enqueue(new SeedRange(){start = r.start, end = olstart});
+                    if (overlapStart >= overlapEnd) continue;
+                    newRanges.Enqueue(new SeedRange(){Start = overlapStart-m.Source+m.Dest, End = overlapEnd-m.Source+m.Dest});
 
-                        if (olend < r.end)
-                            ranges.Enqueue(new SeedRange(){start = olend, end = r.end});
-                        mapped = true;
-                        break;
-                    }
+                    if (r.Start < overlapStart)
+                        _ranges.Enqueue(new SeedRange(){Start = r.Start, End = overlapStart});
+
+                    if (overlapEnd < r.End)
+                        _ranges.Enqueue(new SeedRange(){Start = overlapEnd, End = r.End});
+                    mapped = true;
+                    break;
                 } 
                 if(!mapped)
                     newRanges.Enqueue(r);
             }
-            ranges = newRanges;
+            _ranges = newRanges;
         }
         
-        return new ValueTask<string>(ranges.MinBy(x => x.start).start.ToString()); //
+        return new ValueTask<string>(_ranges.MinBy(x => x.Start).Start.ToString()); //
     } 
 }
