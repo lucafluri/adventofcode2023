@@ -6,7 +6,7 @@ namespace AdventOfCode;
 
 //SOLVED IN PYTHON
 
-public class Day01 : BaseDay
+public partial class Day01 : BaseDay
 {
     private readonly string _input;
     private readonly string[] _inputLines;
@@ -43,7 +43,7 @@ public class Day01 : BaseDay
         
         foreach (var line in _inputLines)
         {
-            string l = Regex.Replace(line, "one", "o1ne");
+            var l = MyRegex().Replace(line, "o1ne");
             l = Regex.Replace(l, "two", "t2wo");
             l = Regex.Replace(l, "three", "t3hree");
             l = Regex.Replace(l, "four", "f4our");
@@ -77,4 +77,7 @@ public class Day01 : BaseDay
 
         return new ValueTask<string>(total.ToString());
     }
+
+    [GeneratedRegex("one")]
+    private static partial Regex MyRegex();
 }
