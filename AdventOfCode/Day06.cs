@@ -46,10 +46,10 @@ public class Day06 : BaseDay
 
     public override ValueTask<string> Solve_2()
     {
-        var s = "";
-        var t = long.Parse(_time.Aggregate(s, (current, t) => current + (t + "")).ToString());
-        s = "";
-        var r = long.Parse(_record.Aggregate(s, (current, r) => current + (r + "")).ToString());
+        var s = _time.Aggregate("", (current, n) => current + n);
+        var t = long.Parse(s);
+        s = _record.Aggregate("", (current, n) => current + n);
+        var r = long.Parse(s);
         
         return new ValueTask<string>(solve(t, r).ToString());
     } 
