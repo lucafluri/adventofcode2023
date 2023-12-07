@@ -2,6 +2,10 @@
 
 namespace AdventOfCode;
 
+// Runtime Total: ~Xms
+// Setup: ~Xms
+// Part 1: ~Xms
+// Part 2: ~Xms
 public class Day08 : BaseDay
 {
     private List<string> _input;

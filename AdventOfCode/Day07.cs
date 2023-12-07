@@ -3,16 +3,17 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode;
 
-// Runtime Total: ~70ms
-// Setup: ~1ms
-// Part 1: ~40ms
-// Part 2: ~29ms
+// Runtime Total: ~24ms
+// Setup: ~2ms
+// Part 1: ~15ms
+// Part 2: ~7ms
 public class Day07 : BaseDay
 {
     private readonly List<string> _input;
     private List<(string hand, int bet, int strength)> _hands = new(); 
     private Dictionary<char, int> _cards = new();
-    private bool part2 = false;
+    private bool _part2 = false;
+    private readonly Regex _rgxLine = new(@"(.*)\s(\d+)");
     
     public Day07()
     {
@@ -27,20 +28,19 @@ public class Day07 : BaseDay
         _hands.Clear();
         foreach (var hand in _input)
         {
-            var matchLine = new Regex(@"(.*)\s(\d+)");
-            var g = matchLine.Match(hand);
+            var g = _rgxLine.Match(hand);
             var h = g.Groups[1].Value;
             var b = int.Parse(g.Groups[2].Value);
             _hands.Add((h, b, GetStrength(h)));
         }
     }
     
-    // Strength of hand: 1-7
+    // Strength of hand: 1-7 
     private int GetStrength(string hand)
     {
         var c = hand.ToCharArray().ToList();
 
-        if (part2 && hand != "JJJJJ")
+        if (_part2 && hand != "JJJJJ")
         {
             var maxChar = c.Where(x => x != 'J').GroupBy(x => x).OrderByDescending(x => x.Count()).First().Key;
             var h2 = hand.Replace("J", maxChar.ToString());
@@ -106,7 +106,7 @@ public class Day07 : BaseDay
 
     public override ValueTask<string> Solve_2()
     {
-        part2 = true;
+        _part2 = true;
         _cards['J'] = 1;
         SetHands();
         

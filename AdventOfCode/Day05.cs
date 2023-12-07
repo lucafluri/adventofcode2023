@@ -3,43 +3,44 @@ using Spectre.Console.Rendering;
 
 namespace AdventOfCode;
 
-// Runtime Total: ~19ms
-// Setup: ~11ms
-// Part 1: ~6ms
+// Runtime Total: ~11ms
+// Setup: ~5ms
+// Part 1: ~3ms
 // Part 2: ~3ms
 public class Day05 : BaseDay
 {
-    private readonly List<Map> _maps = new List<Map>();
-    private readonly List<Int128> _seeds = new List<Int128>();
-    private Queue<SeedRange> _ranges = new Queue<SeedRange>();
+    private readonly List<Map> _maps = new();
+    private readonly List<long> _seeds = new();
+    private Queue<SeedRange> _ranges = new();
+    private static Regex _rgxNonDigit = new("[^0-9]");
+    private static Regex _rgxSpace= new(@"\s+");
 
     private class Mapping
     {
-        public Int128 Source { get; init; }
-        public Int128 Dest { get; init; }
-        public Int128 Range { get; init; }
+        public long Source { get; init; }
+        public long Dest { get; init; }
+        public long Range { get; init; }
     }
 
     private class Map
     {
-        public readonly List<Mapping> Mappings = new List<Mapping>();
+        public readonly List<Mapping> Mappings = new();
     }
     
-    private class SeedRange()
+    private struct SeedRange()
     {
-        public Int128 Start { get; init; }
-        public Int128 End { get; init; }
+        public long Start { get; init; }
+        public long End { get; init; }
     }
     
-    private static List<Int128> GetNumbers(string line)
+    private static List<long> GetNumbers(string line)
     {
-        var rgxNonDigit = new Regex("[^0-9]");
-        var s = rgxNonDigit.Replace(line, " ");
-        s = Regex.Replace(s, @"\s+", " ");
-        return (from seed in s.Trim().Split(" ") where seed != "" select Int128.Parse(seed)).ToList();
+        var s = _rgxNonDigit.Replace(line, " ");
+        s = _rgxSpace.Replace(s,  " ");
+        return (from seed in s.Trim().Split(" ") where seed != "" select long.Parse(seed)).ToList();
     }
 
-    private static bool IsLetter(string str) => !String.IsNullOrEmpty(str) && Char.IsLetter(str[0]);
+    private static bool IsLetter(string str) => !string.IsNullOrEmpty(str) && char.IsLetter(str[0]);
     
     public Day05()
     {
@@ -59,7 +60,7 @@ public class Day05 : BaseDay
 
     public override ValueTask<string> Solve_1()
     {
-        var seeds2 = new List<Int128>(_seeds);
+        var seeds2 = new List<long>(_seeds);
         for(var i = 0; i < seeds2.Count; i++)
         {
             var seed = seeds2[i];
@@ -96,8 +97,8 @@ public class Day05 : BaseDay
                 
                 foreach (var m in map.Mappings)
                 {
-                    var overlapStart = Int128.Max(r.Start, m.Source);
-                    var overlapEnd = Int128.Min(r.End, m.Source + m.Range);
+                    var overlapStart = long.Max(r.Start, m.Source);
+                    var overlapEnd = long.Min(r.End, m.Source + m.Range);
 
                     if (overlapStart >= overlapEnd) continue;
                     newRanges.Enqueue(new SeedRange(){Start = overlapStart-m.Source+m.Dest, End = overlapEnd-m.Source+m.Dest});

@@ -3,82 +3,58 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode;
 
-// Runtime Total: ~30ms
-// Setup: ~0ms
-// Part 1: ~14ms
-// Part 2: ~16ms
+// Runtime Total: ~15ms
+// Setup: ~4ms
+// Part 1: ~5ms
+// Part 2: ~6ms
 public partial class Day01 : BaseDay
 {
-    private readonly string _input;
-    private readonly string[] _inputLines;
+    private List<string> _inputLines;
+    private readonly Regex _rgx = new(@"[^\d]"); // Matches everything except nums
+    private readonly Regex _rgx1 = new(@"one"); 
+    private readonly Regex _rgx2 = new(@"two"); 
+    private readonly Regex _rgx3 = new(@"three"); 
+    private readonly Regex _rgx4 = new(@"four"); 
+    private readonly Regex _rgx5 = new(@"five"); 
+    private readonly Regex _rgx6 = new(@"six"); 
+    private readonly Regex _rgx7 = new(@"seven"); 
+    private readonly Regex _rgx8 = new(@"eight"); 
+    private readonly Regex _rgx9 = new(@"nine"); 
+        
+    private int _total = 0;
 
     public Day01()
     {
-        _input = File.ReadAllText(InputFilePath);
-        _inputLines = File.ReadAllLines(InputFilePath);
+        _inputLines = File.ReadAllLines(InputFilePath).ToList();
     }
 
-
     public override ValueTask<string> Solve_1()
-    {
-        Console.WriteLine("");
-        Console.WriteLine(_inputLines.Length);
-
-        var total = 0;
-
-        foreach (var line in _inputLines)
-        {
-            //Regex remove anything that is not a number
-            Regex rgx = new Regex(@"[^\d]");
-            string l = rgx.Replace(line, "");
-
-            total += int.Parse(l[0] + l[l.Length- 1].ToString());
-        }
+    {   
+        foreach (var l in _inputLines.Select(line => _rgx.Replace(line, "")))
+            _total += int.Parse(l[0] + l[^1].ToString());
         
-        return new ValueTask<string>(total.ToString()); // 54331
+        return new(_total.ToString()); // 54331
     }
 
     public override ValueTask<string> Solve_2()
     {
-        var total = 0;
+        _total = 0;
         
         foreach (var line in _inputLines)
         {
-            var l = MyRegex().Replace(line, "o1ne");
-            l = Regex.Replace(l, "two", "t2wo");
-            l = Regex.Replace(l, "three", "t3hree");
-            l = Regex.Replace(l, "four", "f4our");
-            l = Regex.Replace(l, "five", "f5ive");
-            l = Regex.Replace(l, "six", "s6ix");
-            l = Regex.Replace(l, "seven", "s7even");
-            l = Regex.Replace(l, "eight", "e8ight");
-            l = Regex.Replace(l, "nine", "n9ine");
+            var l = _rgx1.Replace(line, "on1e");
+            l = _rgx2.Replace(l, "t2wo");
+            l = _rgx3.Replace(l,  "t3hree");
+            l = _rgx4.Replace(l,  "f4our");
+            l = _rgx5.Replace(l,  "f5ive");
+            l = _rgx6.Replace(l,  "s6ix");
+            l = _rgx7.Replace(l,  "s7even");
+            l = _rgx8.Replace(l,  "e8ight");
+            l = _rgx9.Replace(l,  "n9ine");
             
-            Regex rgx = new Regex(@"[^\d]");
-            l = rgx.Replace(l, "");
-        
-            total += int.Parse(l[0] + l[l.Length- 1].ToString());
+            l = _rgx.Replace(l, "");
+            _total += int.Parse(l[0] + l[^1].ToString());
         }
-        
-        // LINQ version
-        // var total = (from line in _inputLines 
-        //     select Regex.Replace(line, "one", "o1ne") into l 
-        //     select Regex.Replace(l, "two", "t2wo") into l 
-        //     select Regex.Replace(l, "three", "t3hree") into l 
-        //     select Regex.Replace(l, "four", "f4our") into l 
-        //     select Regex.Replace(l, "five", "f5ive") into l 
-        //     select Regex.Replace(l, "six", "s6ix") into l 
-        //     select Regex.Replace(l, "seven", "s7even") into l 
-        //     select Regex.Replace(l, "eight", "e8ight") into l 
-        //     select Regex.Replace(l, "nine", "n9ine") into l 
-        //     let rgx = new Regex(@"[^\d]") 
-        //     select rgx.Replace(l, "") into l 
-        //     select int.Parse(l[0] + l[l.Length - 1].ToString())).Sum();
-
-
-        return new ValueTask<string>(total.ToString());
+        return new(_total.ToString());
     }
-
-    [GeneratedRegex("one")]
-    private static partial Regex MyRegex();
 }
