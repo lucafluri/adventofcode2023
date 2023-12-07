@@ -3,51 +3,46 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode;
 
-// Runtime Total: ~76ms
-// Setup: ~34ms
-// Part 1: ~9ms
-// Part 2: ~33ms
+// Runtime Total: ~70ms
+// Setup: ~1ms
+// Part 1: ~40ms
+// Part 2: ~29ms
 public class Day07 : BaseDay
 {
-    private List<string> _input;
-    private List<(string, int)> _hands = new List<(string, int)>();
-    private Dictionary<string, int> strengths = new Dictionary<string, int>();
-    private Dictionary<char, int> cards = new Dictionary<char, int>();
+    private readonly List<string> _input;
+    private List<(string hand, int bet, int strength)> _hands = new(); 
+    private Dictionary<char, int> _cards = new();
     private bool part2 = false;
     
     public Day07()
     {
-        cards.Add('2', 2);
-        cards.Add('3', 3);
-        cards.Add('4', 4);
-        cards.Add('5', 5);
-        cards.Add('6', 6);
-        cards.Add('7', 7);
-        cards.Add('8', 8);
-        cards.Add('9', 9);
-        cards.Add('T', 10);
-        cards.Add('J', 11);
-        cards.Add('Q', 12);
-        cards.Add('K', 13);
-        cards.Add('A', 14);
-        
         _input = File.ReadAllLines(InputFilePath).ToList();
-        SetHands();
         
+        _cards.Add('2', 2);
+        _cards.Add('3', 3);
+        _cards.Add('4', 4);
+        _cards.Add('5', 5);
+        _cards.Add('6', 6);
+        _cards.Add('7', 7);
+        _cards.Add('8', 8);
+        _cards.Add('9', 9);
+        _cards.Add('T', 10);
+        _cards.Add('J', 11);
+        _cards.Add('Q', 12);
+        _cards.Add('K', 13);
+        _cards.Add('A', 14);
     }
 
     private void SetHands()
     {
         _hands.Clear();
-        strengths.Clear();
         foreach (var hand in _input)
         {
             var matchLine = new Regex(@"(.*)\s(\d+)");
             var g = matchLine.Match(hand);
             var h = g.Groups[1].Value;
             var b = int.Parse(g.Groups[2].Value);
-            _hands.Add((h, b));
-            strengths.Add(h, GetStrength(h));
+            _hands.Add((h, b, GetStrength(h)));
         }
     }
     
@@ -84,20 +79,18 @@ public class Day07 : BaseDay
         
         for(var i = 0; i < c1.Count; i++)
         {
-            var v1 = cards[c1[i]];
-            var v2 = cards[c2[i]];
-            if (v1 > v2)
-                return 1;
-            if (v1 < v2)
-                return -1;
+            var v1 = _cards[c1[i]];
+            var v2 = _cards[c2[i]];
+            if (v1 > v2) return 1;
+            if (v1 < v2) return -1;
         }
         return 0;
     }
 
-    private int CompareLines((string, int) s1,(string, int) s2)
+    private int CompareLines((string, int, int) s1,(string, int, int) s2)
     {
-        var s1Strength = strengths[s1.Item1];
-        var s2Strength = strengths[s2.Item1];
+        var s1Strength = s1.Item3;
+        var s2Strength = s2.Item3;
         
         if(s1Strength > s2Strength)
             return 1;
@@ -112,21 +105,22 @@ public class Day07 : BaseDay
         _hands.Sort(CompareLines);
         
         for(var i = 0; i < _hands.Count; i++)
-        {
             total += _hands[i].Item2*(i+1);
-        }  
+        
         return total;
     }
-    
+
     public override ValueTask<string> Solve_1()
     {
+        SetHands();
         return new ValueTask<string>(SortAndGetCount().ToString()); // 249748283
     }
+
 
     public override ValueTask<string> Solve_2()
     {
         part2 = true;
-        cards['J'] = 1;
+        _cards['J'] = 1;
         SetHands();
         
         return new ValueTask<string>(SortAndGetCount().ToString()); // 248029057
