@@ -2,12 +2,16 @@
 
 namespace AdventOfCode;
 
-public class Day_26 : BaseDay
+// Runtime Total: ~Xms
+// Setup: ~Xms
+// Part 1: ~Xms
+// Part 2: ~Xms
+public class Day00 : BaseDay
 {
     private List<string> _input;
     
     
-    public Day_26()
+    public Day00()
     {
         _input = File.ReadAllLines(InputFilePath).ToList();
     }

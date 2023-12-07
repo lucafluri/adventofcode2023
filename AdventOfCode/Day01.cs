@@ -3,9 +3,10 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode;
 
-
-//SOLVED IN PYTHON
-
+// Runtime Total: ~30ms
+// Setup: ~0ms
+// Part 1: ~14ms
+// Part 2: ~16ms
 public partial class Day01 : BaseDay
 {
     private readonly string _input;

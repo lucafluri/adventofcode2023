@@ -3,6 +3,10 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode;
 
+// Runtime Total: ~3ms
+// Setup: ~3ms
+// Part 1: ~0.4ms
+// Part 2: ~0.2ms
 public class Day02 : BaseDay
 {
     private readonly string _input;

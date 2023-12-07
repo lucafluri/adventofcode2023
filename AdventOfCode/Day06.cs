@@ -2,6 +2,10 @@
 
 namespace AdventOfCode;
 
+// Runtime Total: ~3ms
+// Setup: ~2ms
+// Part 1: ~0.35ms
+// Part 2: ~1ms
 public class Day06 : BaseDay
 {
     private readonly string[] _input;

@@ -3,6 +3,10 @@ using Spectre.Console.Rendering;
 
 namespace AdventOfCode;
 
+// Runtime Total: ~19ms
+// Setup: ~11ms
+// Part 1: ~6ms
+// Part 2: ~3ms
 public class Day05 : BaseDay
 {
     private readonly List<Map> _maps = new List<Map>();
