@@ -3,10 +3,10 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode;
 
-// Runtime Total: ~24ms
+// Runtime Total: ~21ms
 // Setup: ~2ms
-// Part 1: ~15ms
-// Part 2: ~7ms
+// Part 1: ~12ms
+// Part 2: ~8ms
 public class Day07 : BaseDay
 {
     private readonly List<string> _input;
@@ -35,21 +35,23 @@ public class Day07 : BaseDay
         }
     }
     
-    // Strength of hand: 1-7 
     private int GetStrength(string hand)
     {
-        var c = hand.ToCharArray().ToList();
+        var c = hand.ToCharArray();
 
         if (_part2 && hand != "JJJJJ")
         {
             var maxChar = c.Where(x => x != 'J').GroupBy(x => x).OrderByDescending(x => x.Count()).First().Key;
             var h2 = hand.Replace("J", maxChar.ToString());
-            c = h2.ToCharArray().ToList();
+            c = h2.ToCharArray();
         }
-        
+
         var counts = c.GroupBy(x => x).Select(x => x.Count()).ToList();
 
-        return counts.Max() switch
+        return counts.Max() - counts.Count;
+
+        // Simple Solution
+        /*return counts.Max() switch
         {
             5 => 7, // Five of a kind
             4 => 6, // Four of a kind
@@ -59,14 +61,15 @@ public class Day07 : BaseDay
             2 when counts.Count == 4 => 2, //One pair
             _ => 1
         };
+        */
     }
 
     private int CompareByCard(string s1, string s2)
     {
-        var c1 = s1.ToCharArray().ToList();
-        var c2 = s2.ToCharArray().ToList();
+        var c1 = s1.ToCharArray();
+        var c2 = s2.ToCharArray();
         
-        for(var i = 0; i < c1.Count; i++)
+        for(var i = 0; i < c1.Length; i++)
         {
             var v1 = _cards[c1[i]];
             var v2 = _cards[c2[i]];
