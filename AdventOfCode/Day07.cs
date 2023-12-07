@@ -17,20 +17,9 @@ public class Day07 : BaseDay
     public Day07()
     {
         _input = File.ReadAllLines(InputFilePath).ToList();
-        
-        _cards.Add('2', 2);
-        _cards.Add('3', 3);
-        _cards.Add('4', 4);
-        _cards.Add('5', 5);
-        _cards.Add('6', 6);
-        _cards.Add('7', 7);
-        _cards.Add('8', 8);
-        _cards.Add('9', 9);
-        _cards.Add('T', 10);
-        _cards.Add('J', 11);
-        _cards.Add('Q', 12);
-        _cards.Add('K', 13);
-        _cards.Add('A', 14);
+
+        var i = 2;
+        "23456789TJQKA".ToCharArray().ToList().ForEach(x => _cards.Add(x, i++));
     }
 
     private void SetHands()
