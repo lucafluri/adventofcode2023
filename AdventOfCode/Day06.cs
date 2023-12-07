@@ -11,6 +11,8 @@ public class Day06 : BaseDay
     private readonly string[] _input;
     private readonly List<int> _time;
     private readonly List<int> _record;
+    private static readonly Regex RgxNonDigit = new Regex("[^0-9]");
+    private static readonly Regex RgxSpace= new(@"\s+");
     
     public Day06()
     {
@@ -21,13 +23,12 @@ public class Day06 : BaseDay
     
     private static List<int> GetNumbers(string line)
     {
-        var rgxNonDigit = new Regex("[^0-9]");
-        var s = rgxNonDigit.Replace(line, " ");
-        s = Regex.Replace(s, @"\s+", " ");
+        var s = RgxNonDigit.Replace(line, " ");
+        s = RgxSpace.Replace(s,  " ");
         return (from x in s.Trim().Split(" ") where x != "" select int.Parse(x)).ToList();
     }
 
-    private long solve(long t, long r)
+    private static long Solve(long t, long r)
     {
         // (7-x)x = 9
         // (t-x)x = d
@@ -43,7 +44,7 @@ public class Day06 : BaseDay
     {
         long prod = 1;
         for(var i = 0; i < _time.Count; i++)
-            prod *= solve(_time[i], _record[i]);
+            prod *= Solve(_time[i], _record[i]);
        
         return new ValueTask<string>(prod.ToString());
     }
@@ -55,6 +56,6 @@ public class Day06 : BaseDay
         s = _record.Aggregate("", (current, n) => current + n);
         var r = long.Parse(s);
         
-        return new ValueTask<string>(solve(t, r).ToString());
+        return new ValueTask<string>(Solve(t, r).ToString());
     } 
 }
