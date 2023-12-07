@@ -81,10 +81,9 @@ public class Day07 : BaseDay
         var s1Strength = s1.Item3;
         var s2Strength = s2.Item3;
         
-        if(s1Strength > s2Strength)
-            return 1;
-        if(s1Strength < s2Strength)
-            return -1;
+        if(s1Strength > s2Strength) return 1;
+        if(s1Strength < s2Strength) return -1;
+        
         return CompareByCard(s1.Item1, s2.Item1);
     }
 
@@ -93,8 +92,7 @@ public class Day07 : BaseDay
         long total = 0;
         _hands.Sort(CompareLines);
         
-        for(var i = 0; i < _hands.Count; i++)
-            total += _hands[i].Item2*(i+1);
+        for(var i = 0; i < _hands.Count; i++) total += _hands[i].Item2*(i+1);
         
         return total;
     }
