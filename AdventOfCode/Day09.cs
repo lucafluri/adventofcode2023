@@ -2,80 +2,53 @@
 
 namespace AdventOfCode;
 
-// Runtime Total: ~Xms
-// Setup: ~Xms
-// Part 1: ~Xms
-// Part 2: ~Xms
+// Runtime Total: ~9ms
+// Setup: ~2ms
+// Part 1: ~5ms
+// Part 2: ~3ms
 public class Day09 : BaseDay
 {
-    private List<string> _input;
+    private readonly List<List<int>> _nums = new();
     private List<int> _predictions = new();
-    
     
     public Day09()
     {
-        _input = File.ReadAllLines(InputFilePath).ToList();
+        foreach (var line in File.ReadAllLines(InputFilePath).ToList())
+        {
+            _nums.Add(line.Split(" ").Select(int.Parse).ToList());
+        }
     }
 
-    private int GetPrediction(List<int> nums)
+    private static int GetPrediction(IReadOnlyList<int> nums, bool part2 = false)
     {
         var diffs = new List<int>();
         for (var i = 0; i < nums.Count - 1; i++)
-        {
             diffs.Add(nums[i+1] - nums[i]);
-        }
 
-        if (diffs.All(x => x == 0)) return diffs.Last();
-        return  diffs.Last() + GetPrediction(diffs);
+        if (diffs.All(x => x == 0)) return !part2 ? diffs.Last() : diffs.First();
+        return !part2 ? diffs.Last() + GetPrediction(diffs) : diffs.First() - GetPrediction(diffs, true);
     }
-    
-    private int GetPredictionBefore(List<int> nums)
+
+    private void FillPrediction(bool part2 = false)
     {
-        var diffs = new List<int>();
-        for (var i = 0; i < nums.Count - 1; i++)
+        _predictions.Clear();
+        foreach (var line in _nums)
         {
-            diffs.Add(nums[i+1] - nums[i]);
+            _predictions.Add(GetPrediction(line, part2));
         }
-
-        if (diffs.All(x => x == 0)) return diffs.First();
-        return  diffs.First() - GetPredictionBefore(diffs);
     }
     
-    
-
     public override ValueTask<string> Solve_1()
     {
-        foreach (var line in _input)
-        {
-            // Console.WriteLine(GetPrediction(line.Split(" ").Select(int.Parse).ToList()));
-            _predictions.Add(GetPrediction(line.Split(" ").Select(int.Parse).ToList()));
-        }
-
-        var sum = 0;
-        for(var i = 0; i < _predictions.Count; i++)
-        {
-            sum += _predictions[i]+_input[i].Split(" ").Select(int.Parse).ToList().Last();
-        }
-        
+        FillPrediction(false);
+        var sum = _predictions.Select((t, i) => t + _nums[i].Last()).Sum();
         return new (sum.ToString()); // 1861775706
     }
 
     public override ValueTask<string> Solve_2()
     {
-        _predictions.Clear();
-        foreach (var line in _input)
-        {
-            // Console.WriteLine(GetPrediction(line.Split(" ").Select(int.Parse).ToList()));
-            _predictions.Add(GetPredictionBefore(line.Split(" ").Select(int.Parse).ToList()));
-        }
-
-
-        var sum = 0;
-        for(var i = 0; i < _predictions.Count; i++)
-        {
-            sum += _input[i].Split(" ").Select(int.Parse).ToList().First()-_predictions[i];
-        } 
-        
+        FillPrediction(true);
+        var sum = _predictions.Select((t, i) => _nums[i].First() - t).Sum();
         return new (sum.ToString()); // 1082
     }  
 }
