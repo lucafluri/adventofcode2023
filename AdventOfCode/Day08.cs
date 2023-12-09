@@ -2,10 +2,10 @@
 
 namespace AdventOfCode;
 
-// Runtime Total: ~Xms
-// Setup: ~Xms
-// Part 1: ~Xms
-// Part 2: ~Xms
+// Runtime Total: ~880ms
+// Setup: ~27ms
+// Part 1: ~127ms
+// Part 2: ~726ms
 public class Day08 : BaseDay
 {
     private List<string> _input;
@@ -23,16 +23,14 @@ public class Day08 : BaseDay
 
         public override bool Equals(object obj)
         {
-            return this.Name == ((Node)obj)?.Name;
+            return Name == ((Node)obj)?.Name;
         }
     }
     
     public Day08()
     {
         _input = File.ReadAllLines(InputFilePath).ToList();
-        
         instr = _input[0].ToCharArray();
-        
         SetNodes();
     }
     
@@ -61,33 +59,16 @@ public class Day08 : BaseDay
         }
     }
 
-    private void printNodes()
-    {
-        foreach (var n in _nodes)
-        {
-            Console.WriteLine($"{n.Name} | {n.Left.Name} - {n.Right.Name}");
-        }
-    }
-
     private long GetLoopLength(Node n)
     {
-        // printNodes();
         var current = n;
         var count = 0;
         var q = new Queue<char>(instr);
         while(q.Count > 0)
         {
             var c = q.Dequeue();
-            // Console.WriteLine(c);
-            if (q.Count == 0)
-            {
-                foreach (var ch in instr)
-                {
-                    q.Enqueue(ch);
-                }
-            };
+            if (q.Count == 0) foreach (var ch in instr) q.Enqueue(ch);
             
-            // Console.WriteLine($"{c} - {current.Name}");
             if (c.Equals('L'))
             {
                 current = _nodes.Find(x => x.Name == current.Left.Name);
@@ -112,21 +93,9 @@ public class Day08 : BaseDay
 
         return count;
     }
-     
 
-    public override ValueTask<string> Solve_1()
-    {
-        // printNodes();
-        var current = _nodes.Find(x => x.Name == "AAA");
-        
-        var count = GetLoopLength(current);
-        
-        return new (count.ToString());
-        // return new (0.ToString());
-
-    }
-    
-    public static long lcm_of_array_elements(int[] element_array)
+    // Stolen from the internet
+    private static long lcm_of_array_elements(int[] element_array)
     {
         long lcm_of_array_elements = 1;
         int divisor = 2;
@@ -179,24 +148,18 @@ public class Day08 : BaseDay
         }
     }
 
+    public override ValueTask<string> Solve_1()
+    {
+        var current = _nodes.Find(x => x.Name == "AAA");
+        return new (GetLoopLength(current).ToString());
+    }
+
     public override ValueTask<string> Solve_2()
     {
-        long count = 0;
-        var q = new Queue<char>(instr);
         var nodes = _nodes.FindAll(x => x.lastChar == 'A');
         var loopLengths = new int[nodes.Count];
-           
-
-        // Console.WriteLine($"Nodes: {nodes.Count}");
-        for (var i = 0; i < nodes.Count; i++)
-        {
-            // Console.WriteLine("loopLengths");
-            loopLengths[i] = ((int) GetLoopLength(nodes[i]));
-            // Console.WriteLine($"{i} - {loopLengths[i]}"); 
-        }
-        // Console.WriteLine("Loop Lengts done");
         
+        for (var i = 0; i < nodes.Count; i++) loopLengths[i] = ((int) GetLoopLength(nodes[i]));
         return new (lcm_of_array_elements(loopLengths).ToString());
-        // return new (0.ToString());
     } 
 }
