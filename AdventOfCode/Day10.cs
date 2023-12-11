@@ -23,6 +23,7 @@ public class Day10 : BaseDay
         public int distance { get; set; }
         public bool visited { get; set; } = false;
         public bool isLoop { get; set; } = false;
+        public bool inLoop { get; set; } = false;
 
         public override bool Equals(object obj)
         {
@@ -111,9 +112,53 @@ public class Day10 : BaseDay
         var nn = n.neighbors.First(x => x != null && !x.Equals(before));
         distance++;
         
-        if(nn.type == 'S') return distance;
+        n.visited = true;
+        n.isLoop = true;
+
+        if (nn.type == 'S')
+        {
+            nn.isLoop = true;
+            return distance;
+        }
 
         return GetLoopLength(nn, n, distance);
+    }
+
+    private int getInnerArea()
+    {
+        var count = 0;
+        foreach (var line in _grid)
+        {
+            bool inside = false;
+            char lastEdge = 'L';
+            for(var i = 0; i < line.Count; i++)
+            {
+                
+                if (line[i].type == 'S') line[i].type = '|';
+                if (line[i].isLoop && line[i].type == '|') inside = !inside;
+                if (line[i].isLoop && (line[i].type == 'F' || line[i].type == 'L')) lastEdge = line[i].type;
+                if (line[i].isLoop && (line[i].type == 'J' || line[i].type == '7'))
+                {
+                    var edge = line[i].type;
+                    if(lastEdge == 'F' && edge =='J') inside = !inside;
+                    if(lastEdge == 'L' && edge =='7') inside = !inside;
+                    
+                }
+                
+
+                if (!line[i].isLoop)
+                {
+                    line[i].inLoop = inside;
+                    if (inside)
+                    {
+                        count++;
+                        // Console.WriteLine($"{line[i].type} {line[i].x}, {line[i].y}");
+                    }
+                } 
+            }
+            // Console.WriteLine();
+        }
+        return count;
     }
     
     public Day10()
@@ -127,12 +172,13 @@ public class Day10 : BaseDay
         var dist = GetLoopLength(_start.neighbors[0], _start, 0);
         dist = (int) Math.Ceiling(dist/2f);
        
-        return new (dist.ToString());
+        return new (dist.ToString()); // 6951
     }
 
     public override ValueTask<string> Solve_2()
     {
-        
-        return new (0.ToString());
+        return new (getInnerArea().ToString());
+        //11288 WRONG
+        //7225, 7224, 7084, 2843, 564 WRONG
     } 
 }
