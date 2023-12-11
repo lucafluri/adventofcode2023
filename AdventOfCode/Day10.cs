@@ -2,16 +2,15 @@
 
 namespace AdventOfCode;
 
-// Runtime Total: ~Xms
-// Setup: ~Xms
-// Part 1: ~Xms
-// Part 2: ~Xms
+// Runtime Total: ~39ms
+// Setup: ~15ms
+// Part 1: ~22ms
+// Part 2: ~2ms
 public class Day10 : BaseDay
 {
     private List<string> _input;
     private List<List<Node>> _grid;
     private Node _start;
-    private List<Node> _loop = new List<Node>();
 
     private class Node(char type, int x, int y)
     {
@@ -20,7 +19,6 @@ public class Day10 : BaseDay
         public int y { get; set; } = y;
 
         public Node[] neighbors = new Node[2]; // 0 = up, 1 = right, 2 = down, 3 = left
-        public int distance { get; set; }
         public bool visited { get; set; } = false;
         public bool isLoop { get; set; } = false;
         public bool inLoop { get; set; } = false;
@@ -34,7 +32,7 @@ public class Day10 : BaseDay
         }
     }
 
-    private void addNeighbors(Node n)
+    private void AddNeighbors(Node n)
     {
         switch (n.type)
         {
@@ -96,67 +94,50 @@ public class Day10 : BaseDay
             y++;
         }
 
-        foreach (var line in _grid)
-        {
-            foreach(var node in line)
-            {
-                addNeighbors(node);
-            }
-        }
+        foreach (var node in _grid.SelectMany(line => line))
+            AddNeighbors(node);
+        
         SetStartNeighbors(_start);
     }
     
-    private int GetLoopLength(Node n, Node before, int distance)
+    private static int GetLoopLength(Node n, Node before, int distance)
     {
-        // Console.WriteLine($"{n.x}, {n.y}, {n.type}, {distance}, {before.x}, {before.y}, {before.type}, {n.neighbors.Count(x => x != null)}");
         var nn = n.neighbors.First(x => x != null && !x.Equals(before));
         distance++;
         
         n.visited = true;
         n.isLoop = true;
 
-        if (nn.type == 'S')
-        {
-            nn.isLoop = true;
-            return distance;
-        }
-
-        return GetLoopLength(nn, n, distance);
+        if (nn.type != 'S') return GetLoopLength(nn, n, distance);
+        nn.isLoop = true;
+        return distance;
     }
 
-    private int getInnerArea()
+    private int GetInnerArea()
     {
         var count = 0;
         foreach (var line in _grid)
         {
-            bool inside = false;
-            char lastEdge = 'L';
-            for(var i = 0; i < line.Count; i++)
+            var inside = false;
+            var lastEdge = 'L';
+            foreach (var t in line)
             {
-                
-                if (line[i].type == 'S') line[i].type = '|';
-                if (line[i].isLoop && line[i].type == '|') inside = !inside;
-                if (line[i].isLoop && (line[i].type == 'F' || line[i].type == 'L')) lastEdge = line[i].type;
-                if (line[i].isLoop && (line[i].type == 'J' || line[i].type == '7'))
+                if (t.type == 'S') t.type = '|';
+                if (t.isLoop && t.type == '|') inside = !inside;
+                if (t.isLoop && (t.type == 'F' || t.type == 'L')) lastEdge = t.type;
+                if (t.isLoop && (t.type == 'J' || t.type == '7'))
                 {
-                    var edge = line[i].type;
+                    var edge = t.type;
                     if(lastEdge == 'F' && edge =='J') inside = !inside;
                     if(lastEdge == 'L' && edge =='7') inside = !inside;
                     
                 }
-                
 
-                if (!line[i].isLoop)
-                {
-                    line[i].inLoop = inside;
-                    if (inside)
-                    {
-                        count++;
-                        // Console.WriteLine($"{line[i].type} {line[i].x}, {line[i].y}");
-                    }
-                } 
+                if (t.isLoop) continue;
+                t.inLoop = inside;
+                if (inside)
+                    count++;
             }
-            // Console.WriteLine();
         }
         return count;
     }
@@ -177,8 +158,6 @@ public class Day10 : BaseDay
 
     public override ValueTask<string> Solve_2()
     {
-        return new (getInnerArea().ToString());
-        //11288 WRONG
-        //7225, 7224, 7084, 2843, 564 WRONG
+        return new (GetInnerArea().ToString()); //563
     } 
 }
