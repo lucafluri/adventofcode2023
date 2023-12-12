@@ -8,14 +8,13 @@ namespace AdventOfCode;
 // Runtime Total: ~3.9s
 // Setup: ~4ms
 // Part 1: ~97ms
-// Part 2: ~8.835s
+// Part 2: ~3.835s
 public class Day12 : BaseDay
 {
     private List<string> _inputLines;
     private readonly List<(string, int[])> _in = new();
     private readonly List<(string, int[])> _in2 = new();
     private readonly Dictionary<string, long> _cache = new();
-    
     
     public Day12()
     {
