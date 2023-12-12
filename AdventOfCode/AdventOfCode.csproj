@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="AoCHelper" Version="3.1.0" />
+    <PackageReference Include="PostSharp.Patterns.Caching.IMemoryCache" Version="2024.0.3-preview" />
   </ItemGroup>
 
   <PropertyGroup>
