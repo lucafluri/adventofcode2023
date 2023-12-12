@@ -1,8 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using PostSharp.Patterns.Caching;
-using PostSharp.Patterns.Caching.Backends;
-
+﻿
 namespace AdventOfCode;
 
 // Runtime Total: ~3.9s
@@ -37,7 +33,6 @@ public class Day12 : BaseDay
         return s + " - " + string.Join(",", string.Join(",", sizes) + " - " + groupProgress);
     }
 
-    [Cache]
     private long GetSolutionCount(string s, int[] sizes, int groupProgress)
     {
         if (_cache.TryGetValue(HashKey(s, sizes, groupProgress), out var count))
@@ -69,18 +64,16 @@ public class Day12 : BaseDay
         return sc;
     }
     
-    
-
     public override ValueTask<string> Solve_1()
     {
-        long sum = _in.Sum(l => GetSolutionCount(l.Item1, l.Item2, 0));
+        var sum = _in.Sum(l => GetSolutionCount(l.Item1, l.Item2, 0));
 
         return new (sum.ToString()); // 7694
     } 
 
     public override ValueTask<string> Solve_2()
     {
-        long sum = _in2.Sum(l => GetSolutionCount(l.Item1, l.Item2, 0));
+        var sum = _in2.Sum(l => GetSolutionCount(l.Item1, l.Item2, 0));
 
         return new (sum.ToString()); // 5071883216318
     } 
