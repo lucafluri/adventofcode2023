@@ -6,13 +6,14 @@ namespace AdventOfCode;
 // Setup: ~Xms
 // Part 1: ~Xms
 // Part 2: ~Xms
-public class Day13 : BaseDay
+public class uDay13 : BaseDay
 {
     private List<List<string>> _input;
     private List<List<uint>> _grids_rows = new();
     private List<List<uint>> _grids_cols = new();
     
-    public Day13()
+    
+    public uDay13() 
     {
         _input = File.ReadAllText(InputFilePath).Split("\n\n").Select(x => x.Split("\n").ToList()).ToList();
         
@@ -39,19 +40,6 @@ public class Day13 : BaseDay
                 _grids_cols[^1].Add(BoolArrayToInt(col));  
             }
         }
-        
-        for(var i = 0; i < _grids_rows.Count; i++)
-        {
-            Console.WriteLine("Grid " + i);
-            foreach (var row in _grids_rows[i])
-                Console.Write($"{row}, ");
-            Console.WriteLine();
-            foreach (var col in _grids_cols[i])
-                Console.Write($"{col}, ");
-            Console.WriteLine();  
-        }
-          
-        
     }
     
     
@@ -80,31 +68,23 @@ public class Day13 : BaseDay
             }
             else
             {
-                // Length from End of list to i 
                 length = list.Count - i - 1;
                 start = i - length + 1;
             }
             
-            // Console.WriteLine($"{start} - {length}");
             left = list.Slice(start, length);
             right = list.Slice(start + length, length);
             right.Reverse();   
             
-            //562, 530, 206, 1004, 1004, 206, 530, 
-            //178, 48, 206, 132, 74, 74, 132 
-
-            
             if (left.SequenceEqual(right)) 
             {
-                // Console.WriteLine($"Equal: {string.Join(", ", left)} vs. {string.Join(", ", right)} => Center : {i}");
                 center = i+1;
                 break;
             }
         }
         return center != 0 ? center  : 0;
     }
-
-
+    
     private int FindMirrorAndCalcSum(List<List<uint>> rows, List<List<uint>> cols)
     {
         var rowIDSum = 0;
@@ -127,7 +107,55 @@ public class Day13 : BaseDay
         return colIDSum+100*rowIDSum; // 30535
     }
 
- 
+    private int GetNewGridSum(List<uint> originalRows, List<uint> originalCols)
+    {
+        int totalSum = 0;
+    
+        for (int y = 0; y < originalRows.Count; y++)
+        {
+            for (int x = 0; x < originalCols.Count; x++)
+            {
+                var tempRows = new List<uint>(originalRows);
+                var tempCols = new List<uint>(originalCols);
+                UpdateGridValues(tempRows, tempCols, x, y);
+    
+                int oldRowSum = FindMirrorCenter(originalRows);
+                int oldColSum = FindMirrorCenter(originalCols);
+                int newRowSum = FindMirrorCenter(tempRows);
+                int newColSum = FindMirrorCenter(tempCols);
+            
+                // Check if new mirror center is different from the old one
+                if ((newRowSum != oldRowSum && newRowSum > 0) || (newColSum != oldColSum && newColSum > 0))
+                {
+                    totalSum += newColSum + 100 * newRowSum;
+                    return totalSum;
+                }
+            }
+        }
+        return totalSum;
+    }
+    
+    private void UpdateGridValues(List<uint> rows, List<uint> cols, int x, int y)
+    {
+        uint powerForRow = (uint)Math.Pow(2, cols.Count - x - 1);
+        uint powerForCol = (uint)Math.Pow(2, rows.Count - y - 1);
+
+        var binary = Convert.ToString(rows[y], 2).PadLeft(cols.Count, '0').ToCharArray();
+
+        switch (binary[x])
+        {
+            case '1':
+                cols[x] -= powerForCol;
+                rows[y] -= powerForRow;
+                break;
+            case '0':
+                cols[x] += powerForCol;
+                rows[y] += powerForRow;
+                break;
+        }
+    }
+
+  
     public override ValueTask<string> Solve_1()
     {
         return new (FindMirrorAndCalcSum(_grids_rows, _grids_cols).ToString()); // 30535
@@ -141,23 +169,17 @@ public class Day13 : BaseDay
         
         var _gr = _grids_rows.Select(x => x.ToList()).ToList();
         var _gc = _grids_cols.Select(x => x.ToList()).ToList();
-        
-        for (var y = 0; y < _gr.Count; y++)
+
+        var newSum = 0;
+
+        for (var i = 0; i < _gr.Count; i++)
         {
-            for (var x = 0; x < _gc.Count; x++)
-            {
-                // var rx = _gc.Count - x;
-                // var ry = _gr.Count - y;
-                //
-                // var power_col = Math.Pow(2, rx);
-                // var power_row = Math.Pow(2, ry);
-                //
-                // if()
-            }
+            var row = _gr[i];
+            var col = _gc[i];
+            newSum += GetNewGridSum(row, col);
         }
-        
-        
-        
-        return new (0.ToString());
+
+        return new (newSum.ToString()); // 30844
+        // WRONG:  L-20091, H-33882, L-28475, H-35102, H-31763, L-29639, L-30036 L-30636
     } 
 }
