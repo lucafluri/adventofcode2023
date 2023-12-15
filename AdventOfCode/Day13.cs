@@ -179,7 +179,7 @@ public class uDay13 : BaseDay
             newSum += GetNewGridSum(row, col);
         }
 
-        return new (newSum.ToString()); // 30844
+        return new (newSum.ToString());  
         // WRONG:  L-20091, H-33882, L-28475, H-35102, H-31763, L-29639, L-30036 L-30636
     } 
 }
