@@ -28,7 +28,7 @@ public class Day14 : BaseDay
         
         _grid2 = _grid.Clone() as char[,];
         
-        printGrid();
+        // printGrid();
     }
     
     private void printGrid()
@@ -166,7 +166,7 @@ public class Day14 : BaseDay
     public override ValueTask<string> Solve_1()
     {
         MoveRocksNorth();
-        printGrid();
+        // printGrid();
        
         return new (CalculateTotalLoad().ToString());
     }

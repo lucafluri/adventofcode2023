@@ -6,14 +6,14 @@ namespace AdventOfCode;
 // Setup: ~Xms
 // Part 1: ~Xms
 // Part 2: ~Xms
-public class uDay13 : BaseDay
+public class Day13 : BaseDay
 {
     private List<List<string>> _input;
     private List<List<uint>> _grids_rows = new();
     private List<List<uint>> _grids_cols = new();
     
     
-    public uDay13() 
+    public Day13() 
     {
         _input = File.ReadAllText(InputFilePath).Split("\n\n").Select(x => x.Split("\n").ToList()).ToList();
         
