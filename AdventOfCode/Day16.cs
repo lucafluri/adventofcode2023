@@ -109,12 +109,18 @@ public class Day16 : BaseDay
     public override ValueTask<string> Solve_2()
     {
         endings.Clear();
-        var max = 0;
-        foreach (var start in GetStarts())
+        var starts = GetStarts();
+        int max = 0;
+        object lockObj = new object();
+
+        Parallel.ForEach(starts, start =>
         {
             var count = CountTiles(start);
-            if (count > max) max = count;
-        }
+            lock (lockObj)
+            {
+                if (count > max) max = count;
+            }
+        });
         
         return new (max.ToString()); // 7635
     } 
