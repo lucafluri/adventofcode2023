@@ -166,8 +166,6 @@ public class Day14 : BaseDay
     public override ValueTask<string> Solve_1()
     {
         MoveRocksNorth();
-        // printGrid();
-       
         return new (CalculateTotalLoad().ToString());
     }
 
