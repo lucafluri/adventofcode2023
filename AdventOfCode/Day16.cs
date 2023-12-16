@@ -18,17 +18,6 @@ public class Day16 : BaseDay
 
     private HashSet<Complex> endings = new();
     
-    struct Beam
-    {
-        public Complex pos { get; set; }
-        public Complex dir { get; set; }
-        
-        // public override bool Equals(object obj)
-        // {
-        //     return obj is Beam other && Equals(other);
-        // }
-    }
-    
     private void ReadDiagram()
     {
         _map.Clear();
@@ -57,48 +46,47 @@ public class Day16 : BaseDay
         return [dir];
     }
 
-    private int CountTiles(Beam start)
+    private int CountTiles((Complex, Complex) start)
     {
-        if(endings.Contains(start.pos)) return 0;
-        var queue = new Queue<Beam>();
+        if(endings.Contains(start.Item1)) return 0;
+        var queue = new Queue<(Complex, Complex)>();    
         queue.Enqueue(start);
-        var visited = new HashSet<Beam>();
+        var visited = new HashSet<(Complex, Complex)>();
 
         while (queue.Count != 0)
         {
             var b = queue.Dequeue();
-            // Console.WriteLine($"{b.pos} {b.dir} on {_map[b.pos]}");
             visited.Add(b); 
-            var newDirs = GetNewDirs(_map[b.pos], b.dir);
+            var newDirs = GetNewDirs(_map[b.Item1], b.Item2);
             foreach (var dir in newDirs)
             {
-                var newPos = b.pos + dir;
-                if (_map.ContainsKey(newPos) && !visited.Contains(new Beam(){pos = newPos, dir = dir}))
+                var newPos = b.Item1 + dir;
+                if (_map.ContainsKey(newPos) && !visited.Contains((newPos, dir)))
                 {
-                    queue.Enqueue(new Beam(){pos = newPos, dir = dir});
+                    queue.Enqueue((newPos, dir));
                 }
             }
-            if(queue.Count == 0) endings.Add(b.pos);
+            if(queue.Count == 0) endings.Add(b.Item1);
         }
-        return visited.Select(x => x.pos).Distinct().Count();
+        return visited.Select(x => x.Item1).Distinct().Count();
     }
 
     // Get all start beams around the edge of the map
-    private Beam[] GetStarts()
+    private (Complex, Complex)[] GetStarts()
     {
-        var beams = new List<Beam>();
+        var beams = new List<(Complex, Complex)>();
         var maxX = (int) _map.Keys.Max(x => x.Real);
         var maxY = (int) _map.Keys.Max(x => x.Imaginary);
         
         for (var x = 0; x <= maxX; x++)
         {
-            beams.Add(new Beam(){pos = new Complex(x, 0), dir = DOWN});
-            beams.Add(new Beam(){pos = new Complex(x, maxY), dir = UP});
+            beams.Add((new Complex(x, 0), DOWN));
+            beams.Add((new Complex(x, maxY), DOWN));
         }
         for (var y = 0; y <= maxY; y++)
         {
-            beams.Add(new Beam(){pos = new Complex(0, y), dir = RIGHT});
-            beams.Add(new Beam(){pos = new Complex(maxX, y), dir = LEFT});
+            beams.Add((new Complex(0, y), RIGHT));
+            beams.Add((new Complex(maxX, y),LEFT));
         }
         return beams.ToArray();
     }
@@ -114,8 +102,7 @@ public class Day16 : BaseDay
 
     public override ValueTask<string> Solve_1()
     {
-        var start = new Beam(){pos = new Complex(0, 0), dir = RIGHT};
-       
+        var start =(new Complex(0, 0), RIGHT); 
         return new (CountTiles(start).ToString()); // 7307
     }
   
