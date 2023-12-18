@@ -9,9 +9,14 @@ namespace AdventOfCode;
 public class Day18 : BaseDay
 {
     private List<string> _input;
-    private static readonly Regex _rgxline = new(@"([UDLR])\s(\d+)\s\(#(.{6})\)");
-    private readonly List<(int x, int y)> _loop2 = new();
-    private readonly List<(int x, int y)> _loop = new();
+    private List<(int, int)> _loop = [];
+    private List<(int, int)> _loop2 = [];
+    
+    private static readonly Dictionary<string, (int dx, int dy)> DirectionMap = new()
+    {
+        {"U", (0, -1)}, {"D", (0, 1)}, {"L", (-1, 0)}, {"R", (1, 0)},
+        {"0", (1, 0)}, {"1", (0, 1)}, {"2", (-1, 0)}, {"3", (0, -1)}
+    };
     
     public Day18()
     {
@@ -19,35 +24,34 @@ public class Day18 : BaseDay
 
         var (x, y, x2, y2) = (0, 0, 0, 0);
 
-        foreach (var match in _input.Select(line => _rgxline.Match(line)))
+        _loop.Capacity = _input.Sum(line => int.Parse(line.Split(' ')[1]));
+        _loop2.Capacity = _input.Sum(line => (int)Convert.ToInt64(line.Split(' ')[2][2..7], 16));
+        
+        foreach (var line in _input)
         {
-            var dir = match.Groups[1].Value;
-            var steps = int.Parse(match.Groups[2].Value);
-            var color = match.Groups[3].Value;
+            var parts = line.Split(' ');
+            var dir = parts[0];
+            var steps = int.Parse(parts[1]);
+            var color = parts[2][2..8]; 
 
-            var steps2 = Convert.ToInt64(color.Substring(0, 5), 16);
-            var dir2 = color.Substring(5, 1);
+            var steps2 = Convert.ToInt64(color[..5], 16);
+            var dir2 = color[5].ToString();
 
-            AddSteps(ref x, ref y, dir, steps, _loop);
-            AddSteps(ref x2, ref y2, dir2, steps2, _loop2);
+            AddSteps(dir, steps, _loop);
+            AddSteps(dir2, steps2, _loop2);
         }
     }
 
-    private static void AddSteps(ref int x, ref int y, string dir, long steps, List<(int, int)> loop)
+    private static void AddSteps(string dir, long steps, List<(int, int)> loop)
     {
+        DirectionMap.TryGetValue(dir, out var direction);
+        var (dx, dy) = direction;
+        var (x, y) = loop.LastOrDefault();
+
         for (var i = 0; i < steps; i++)
         {
-            switch (dir)
-            {
-                case "U":
-                case "3": y--; break;
-                case "D":
-                case "1": y++; break;
-                case "L": 
-                case "2": x--; break;
-                case "R": 
-                case "0": x++; break;
-            }
+            x += dx;
+            y += dy;
             loop.Add((x, y));
         }
     }
@@ -61,22 +65,40 @@ public class Day18 : BaseDay
             var j = (i + 1) % n;
             area += (vertices[i].x * vertices[j].y) - (vertices[j].x * vertices[i].y);
         }
-        return (long)(Math.Abs(area) / 2.0);
+        return (long)(Math.Abs(area) / 2.0) + 1 + vertices.Count / 2;
+    }
+    
+    private static long CalculateAreaParallel(IReadOnlyList<(int x, int y)> vertices)
+    {
+        double area = 0;
+        var n = vertices.Count;
+
+        Parallel.For(0, n, 
+            () => 0.0, 
+            (i, state, localArea) =>
+            {
+                var j = (i + 1) % n;
+                localArea += (vertices[i].x * vertices[j].y) - (vertices[j].x * vertices[i].y);
+                return localArea; 
+            },
+            localArea => 
+            {
+                lock (vertices) 
+                    area += localArea;
+            }
+        );
+
+        return (long)(Math.Abs(area) / 2.0) + 1 + vertices.Count / 2;
     }
 
-    private static long CalculateInteriorPoints(IReadOnlyList<(int x, int y)> vertices)
-    {
-        var area = CalculateArea(vertices);
-        return (long)(area + 1 + vertices.Count / 2.0);
-    }
 
     public override ValueTask<string> Solve_1()
     {        
-        return new (CalculateInteriorPoints(_loop).ToString()); // 46334
+        return new (CalculateAreaParallel(_loop).ToString()); // 46334
     } 
 
     public override ValueTask<string> Solve_2()
     {
-        return new (CalculateInteriorPoints(_loop2).ToString()); // 102000662718092
+        return new (CalculateAreaParallel(_loop2).ToString()); // 102000662718092
     } 
 } 
