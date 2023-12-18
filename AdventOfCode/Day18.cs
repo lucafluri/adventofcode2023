@@ -2,10 +2,10 @@
 
 namespace AdventOfCode;
 
-// Runtime Total: ~Xms
-// Setup: ~Xms 
-// Part 1: ~Xms
-// Part 2: ~Xms
+// Runtime Total: ~2.5s
+// Setup: ~2s 
+// Part 1: ~9ms
+// Part 2: ~450ms
 public class Day18 : BaseDay
 {
     private List<string> _input;
