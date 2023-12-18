@@ -10,12 +10,14 @@ public class Day18 : BaseDay
 {
     private List<string> _input;
     private static readonly Regex _rgxline = new(@"([UDLR])\s(\d+)\s\(#(.{6})\)");
-    private readonly List<(int x, int y)> _loop2 = [];
-    private readonly List<(int x, int y)> _loop = [];
+    private readonly List<(int x, int y)> _loop2 = new();
+    private readonly List<(int x, int y)> _loop = new();
     
     public Day18()
     {
         _input = File.ReadAllLines(InputFilePath).ToList();
+
+        var (x, y, x2, y2) = (0, 0, 0, 0);
 
         foreach (var match in _input.Select(line => _rgxline.Match(line)))
         {
@@ -26,14 +28,13 @@ public class Day18 : BaseDay
             var steps2 = Convert.ToInt64(color.Substring(0, 5), 16);
             var dir2 = color.Substring(5, 1);
 
-            AddSteps(dir, steps, _loop);
-            AddSteps(dir2, steps2, _loop2);
+            AddSteps(ref x, ref y, dir, steps, _loop);
+            AddSteps(ref x2, ref y2, dir2, steps2, _loop2);
         }
     }
 
-    private static void AddSteps(string dir, long steps, List<(int, int)> loop)
+    private static void AddSteps(ref int x, ref int y, string dir, long steps, List<(int, int)> loop)
     {
-        var (x, y) = (0, 0);
         for (var i = 0; i < steps; i++)
         {
             switch (dir)
