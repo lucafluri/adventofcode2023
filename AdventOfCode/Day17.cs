@@ -69,12 +69,12 @@ public class Day17 : BaseDay
 
     public override ValueTask<string> Solve_1()
     {
-        return new (FindPath(1, 3).ToString());
+        return new (FindPath(1, 3).ToString()); // 694
     }
 
     public override ValueTask<string> Solve_2()
     {
-        
-        return new (FindPath(4, 10).ToString());
-    } 
+
+        return new(FindPath(4, 10).ToString()); // 829 
+    }
 }
