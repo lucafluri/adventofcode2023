@@ -11,8 +11,6 @@ public class Day21 : BaseDay
     {
         _input = File.ReadAllLines(InputFilePath).ToList();
     }
-    
-    
 
     public override ValueTask<string> Solve_1()
     {
