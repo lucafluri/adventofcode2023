@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode;
 
@@ -36,105 +37,71 @@ public class Day21 : BaseDay
         
         Console.WriteLine($"Width: {_width}, Height: {_height}");
     }
-    
-    private HashSet<(int, int)> FindPaths((int, int) current, int stepsLeft)
+
+    public int FindPaths(int step, (int, int) start)
     {
-        if (stepsLeft == 0)
-        {
-            return new HashSet<(int, int)> { current }; 
-        }
+        var (x, y) = start;
+        var visited = new Dictionary<(int, int), int> { { (x, y), 0 } };
+        var distance = 0;
+        var queue = new Queue<(int, int)>();
+        queue.Enqueue((x, y));
+        var result = 0;
 
-        if (_cache.TryGetValue((current, stepsLeft), out var memoizedResult))
+        while (distance < step)
         {
-            return memoizedResult;
-        }
- 
-        var paths = new HashSet<(int, int)>();
-        foreach (var next in dirs.Select(dir => ((current.Item1 + dir.Item1) % _width, (current.Item2 + dir.Item2) % _height)))
-        {
-            if (!_grid.TryGetValue(next, out var value) || value != '.') continue;
-            var subPaths = FindPaths(next, stepsLeft - 1);
-            paths.UnionWith(subPaths);
-        }
+            distance++;
+            var nextQueue = new Queue<(int, int)>();
+            while (queue.Count > 0)
+            {
+                (x, y) = queue.Dequeue();
+                foreach (var (dx, dy) in dirs)
+                {
+                    var (nx, ny) = (dx + x, dy + y);
+                    var (tx, ty) = ((nx % _width + _width) % _width, (ny % _height + _height) % _height);
+                    if (_grid.ContainsKey((tx, ty)) &&
+                        (_grid[(tx, ty)] == '#' || visited.ContainsKey((nx, ny)))) continue;
+                    visited[(nx, ny)] = distance;
+                    nextQueue.Enqueue((nx, ny));
+                }
+            }
+            queue = nextQueue;
 
-        _cache[(current, stepsLeft)] = paths;
-        return paths;
-    }
-
-    private int GetReachableGardens(int steps, int maxRadius = 0)
-    {
-        var paths = FindPaths(_start, steps);
-        var count = 0;
-        count = paths.Count;
-        if (maxRadius > 0)
-        {
-            // count = paths.Count(x => Math.Abs(x.Item1) <= maxRadius && Math.Abs(x.Item2) <= maxRadius);
-            paths.RemoveWhere(x => Math.Abs(x.Item1-_start.Item1) > maxRadius || Math.Abs(x.Item2-_start.Item2) > maxRadius);
-            count = paths.Count;
+            if (distance != step) continue;
+            result += visited.Values.Count(v => v % 2 == step % 2);
         }
-        return count;
+        return result;
     }
 
     public override ValueTask<string> Solve_1() 
     {
-        return new (GetReachableGardens(64, _width/2).ToString()); // 3699
+        return new ( FindPaths(64, _start).ToString()); // 3699
     }
 
     public override ValueTask<string> Solve_2()
     {
-        // var l = new List<long>();
-        // for(var i = 1; i < _width; i++)
-        // {
-        // Console.WriteLine(GetReachableGardens(133, 65));
-        // Console.WriteLine($"{l[^1]}");
-        // }
+        // Grows quadratically => x = steps
+        // y = ax^2 + bx + c
+        // y(0) with x = width/2 until edge
+        // y(1) with x = width/2 + width
+        // y(2) with x = width/2 + 2*width
         
+        long y0 = FindPaths(65, _start);
+        long y1 = FindPaths(65 + _width, _start);
+        long y2 = FindPaths(65 + 2*_width, _start);
         
-        var steps = 26501365;
-        var radius = _width / 2;
-        var n = (steps - radius) / _width;
-        
-        Console.WriteLine($"Steps: {steps}, Radius: {radius}, N: {n}");
-        // var innerArea = GetReachableGardens(_width, radius);
-        var innerArea = 11286; 
-         
-        // for(var i = 0; i < 100; i++)
-        // {
-        //     Console.WriteLine($"{i}: {GetReachableGardens(_width+i, radius)}");
-        // }
-        // Console.WriteLine($"{GetReachableGardens(_width, radius)}");
-        // Console.WriteLine($"{GetReachableGardens(_width+1, radius)}");
-        // Console.WriteLine($"{GetReachableGardens(_width+2, radius)}");
-        // 26501365 = 65 + (202300 * 131)
-        // STEPS  = InnerRadius-1 + (Diamond Radius * width)
-        // Num Paths: 11286 (odd steps - 131) => Calced via GetReachableGardens(131, 65)
-        // Num Paths: 11365 (even steps - 132) => Calced via GetReachableGardens(132, 65)
-        // Num Paths: 11397 (odd steps - 133) => Calced via GetReachableGardens(133, 65)
-        
-        // n = 202300 
-        // (n+1)^2 + n^2 = Area
-        // area - (n+1)/2 = area
-        // area + n/2 = area
+        Console.WriteLine($"y0: {y0}, y1: {y1}, y2: {y2}");
 
-        // long n = 202300;
-        // long n = ()
+        Int128 n = 26501365;
+        n = (n-_width/2)/_width;
+        Console.WriteLine($"N: {n}");
         
+        //  (1) y0 = c, (2) y1 = a + b + c, (3) y2 = 4a + b + c
+        var c = y0;
+        var b = (4 * y1 - y2 - 3 * y0) / 2;
+        var a = y1 - y0 - b;
         
-        long area = (n+1)*(n+1) + n*n;
-        area -= (n+1)*2;
-        area += (3*n)/2;
-        area *= innerArea;
-        Console.WriteLine($"Area: {area}");
+        var res = a * n * n + b * n + c;
         
-        
-        
-        
-        
-        return new (area.ToString());
-        // L-81_850_782_301
-        // L-81_851_186_901
-        // H-923_772_495_364_686
-        // ?-2_782_053_454_950
-        // ?-2_801_527_336_125  
+        return new (res.ToString()); // 613391294577878
     } 
 }
