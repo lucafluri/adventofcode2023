@@ -56,7 +56,7 @@ public class Day21 : BaseDay
                 (x, y) = queue.Dequeue();
                 foreach (var (dx, dy) in dirs)
                 {
-                    var (nx, ny) = (dx + x, dy + y);
+                    var (nx, ny) = (dx + x, dy + y); 
                     var (tx, ty) = ((nx % _width + _width) % _width, (ny % _height + _height) % _height);
                     if (_grid.ContainsKey((tx, ty)) &&
                         (_grid[(tx, ty)] == '#' || visited.ContainsKey((nx, ny)))) continue;
