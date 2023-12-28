@@ -17,7 +17,7 @@ else
     // var indexes = args.Select(arg => uint.TryParse(arg, out var index) ? index : uint.MaxValue);
 
     // await Solver.Solve(indexes.Where(i => i < uint.MaxValue));
-    await Solver.Solve<Day21>(opt =>
+    await Solver.Solve<Day23>(opt =>
     {
         opt.ShowConstructorElapsedTime = true;
         opt.ShowTotalElapsedTimePerDay = true;
