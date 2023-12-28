@@ -1,5 +1,8 @@
 # Advent of Code 2023 in C#
 My AoC 2023 Solutions, based on the Template below.
+Solved in C# using .NET 8.0.
+
+Days Solved: 25/25
 
 
 
