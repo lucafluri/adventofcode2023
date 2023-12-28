@@ -76,40 +76,36 @@ public class Day24 : BaseDay
 
     public override ValueTask<string> Solve_2()
     {
-        var min = -500;
-        var max = 500;
+        var range = 250;
         
-        var (h0, h1, h2, h3) = (_hs[0] , _hs[1], _hs[2], _hs[3]);
+        var (h0, h1, h2) = (_hs[0] , _hs[1], _hs[2]);
         
-        // Find plane where all 4 hails intersect
-        for(var y = min; y < max; y++)
-        for(var x = min; x < max; x++)
+        // Find plane where all 3 hails intersect
+        for(var y = -range; y < range; y++)
+        for(var x = -range; x < range; x++)
         {
             var h0t = h0 with { vel = (h0.vel.Item1 + x, h0.vel.Item2 + y, h0.vel.Item3) };
             var h1t = h1 with { vel = (h1.vel.Item1 + x, h1.vel.Item2 + y, h1.vel.Item3) };
             var h2t = h2 with { vel = (h2.vel.Item1 + x, h2.vel.Item2 + y, h2.vel.Item3) };
-            var h3t = h3 with { vel = (h3.vel.Item1 + x, h3.vel.Item2 + y, h3.vel.Item3) };
             
             var i1 = IntersectPointInt(h0t, h1t);
             var i2 = IntersectPointInt(h0t, h2t);
-            var i3 = IntersectPointInt(h0t, h3t);
             
-            if (i1 == null || i2 == null || i3 == null) continue;
+            if (i1 == null || i2 == null ) continue;
             
-            if (i1.Value.Item1 != i2.Value.Item1 || i1.Value.Item1 != i3.Value.Item1) continue;
-            if (i1.Value.Item2 != i2.Value.Item2 || i1.Value.Item2 != i3.Value.Item2) continue;
+            if (i1.Value.Item1 != i2.Value.Item1) continue;
+            if (i1.Value.Item2 != i2.Value.Item2) continue;
         
-            for (var z = min; z < max; z++)
+            for (var z = -range; z < range; z++)
             {
                 // Interpolate z
                 var z1 = (h1.pos.Item3 + i1.Value.t2 * (h1t.vel.Item3+z));
                 var z2 = (h2.pos.Item3 + i2.Value.t2 * (h2t.vel.Item3+z));
-                var z3 = (h3.pos.Item3 + i3.Value.t2 * (h3t.vel.Item3+z));
                 
-                if (z1 != z2 || z1 != z3) continue;
+                if (z1 != z2) continue;
                 return new ((i1.Value.Item1 + i1.Value.Item2 + z1).ToString());
             }
         }
-        return new ("NA".ToString());
+        return new ("NA".ToString()); // 801386475216902
     } 
 }
