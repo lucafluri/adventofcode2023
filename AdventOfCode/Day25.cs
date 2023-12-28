@@ -5,7 +5,6 @@ namespace AdventOfCode;
 
 public class Day25 : BaseDay
 {
-    private List<string> _input;
     private Dictionary<string, List<string>> _graph = new();
     private readonly Dictionary<string, List<string>> _graphT = new();
     
@@ -13,8 +12,8 @@ public class Day25 : BaseDay
     {
         if (!_graph.ContainsKey(from))
         {
-            _graph[from] = new List<string>();
-            _graphT[from] = new List<string>();
+            _graph[from] = new();
+            _graphT[from] = new();
         }
         _graph[from].Add(to);
         _graphT[from].Add(to);
@@ -22,9 +21,7 @@ public class Day25 : BaseDay
     
     public Day25()
     {
-        _input = File.ReadAllLines(InputFilePath).ToList();
-
-        foreach (var line in _input)
+        foreach (var line in  File.ReadAllLines(InputFilePath).ToList())
         {
             var parts = line.Split(": ");
             var key = parts[0];
